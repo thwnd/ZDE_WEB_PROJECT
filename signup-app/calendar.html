@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>캘린더</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        #calendar {
+            width: 80%;
+            margin-top: 20px;
+        }
+        .add-event-container {
+            margin-top: 20px;
+        }
+        .add-event-container input, .add-event-container button {
+            padding: 10px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>나의 일정 관리</h2>
+
+<div id='calendar'></div>
+
+<div class="add-event-container">
+    <h3>일정 추가</h3>
+    <input type="text" id="title" placeholder="일정 제목">
+    <input type="date" id="start-date">
+    <input type="date" id="end-date">
+    <input type="text" id="description" placeholder="설명">
+    <button onclick="addEvent()">일정 추가</button>
+</div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: '/get-events' // 서버에서 일정 가져오기
+        });
+
+        calendar.render();
+    });
+
+    function addEvent() {
+        const title = document.getElementById('title').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        const description = document.getElementById('description').value;
+
+        axios.post('/add-event', {
+            userId: 1, // 실제 애플리케이션에서는 세션 또는 JWT를 사용하여 userId를 얻습니다.
+            title: title,
+            startDate: startDate,
+            endDate: endDate,
+            description: description
+        })
+        .then(response => {
+            alert('일정이 추가되었습니다.');
+            window.location.reload(); // 일정 추가 후 페이지 새로고침
+        })
+        .catch(error => {
+            console.error('일정 추가 중 오류 발생:', error);
+            alert('일정 추가에 실패했습니다.');
+        });
+    }
+</script>
+
+</body>
+</html>
